@@ -1,0 +1,139 @@
+import re
+
+"""
+general info:
+https://en.wikipedia.org/wiki/Naming_convention_(programming)#Python_and_Ruby
+
+pascal case [ an upper Camel Case ]: https://en.wikipedia.org/wiki/Camel_case
+
+camel case: https://en.wikipedia.org/wiki/Camel_case
+
+kebab case [ can be found in general info ]:
+https://en.wikipedia.org/wiki/Naming_convention_(programming)#Python_and_Ruby
+
+snake case: https://en.wikipedia.org/wiki/Snake_case
+"""
+
+
+# assistant functions
+def split_input(str_: str) -> list:
+    """
+    Split string on any non-alphanumeric, non-space character, then tokenize by space.
+    Special characters (punctuation, symbols) act as delimiters and are discarded.
+
+    >>> split_input("one two 31235three4four")
+    [['one', 'two', '31235three4four']]
+    """
+    # re.split on non-alphanumeric/non-space chars produces segments; each is word-split
+    return [char.split() for char in re.split(r"[^ a-z A-Z 0-9 \s]", str_)]
+
+
+def to_simple_case(str_: str) -> str:
+    """
+    Capitalizes the first letter of each word and merges them (PascalCase base).
+    Special characters are stripped.
+
+    >>> to_simple_case("one two 31235three4four")
+    'OneTwo31235three4four'
+    >>> to_simple_case("This should be combined")
+    'ThisShouldBeCombined'
+    >>> to_simple_case("The first letters are capitalized, then string is merged")
+    'TheFirstLettersAreCapitalizedThenStringIsMerged'
+    >>> to_simple_case("special characters :, ', %, ^, $, are ignored")
+    'SpecialCharactersAreIgnored'
+    """
+    string_split = split_input(str_)
+    return "".join(
+        ["".join([char.capitalize() for char in sub_str]) for sub_str in string_split]
+    )
+
+
+def to_complex_case(text: str, upper: bool, separator: str) -> str:
+    """
+    Returns the string concatenated with the delimiter we provide.
+
+    Parameters:
+    @text: The string on which we want to perform operation
+    @upper: Boolean value to determine whether we want capitalized result or not
+    @separator: The delimiter with which we want to concatenate words
+
+    Examples:
+    >>> to_complex_case("one two 31235three4four", True, "_")
+    'ONE_TWO_31235THREE4FOUR'
+    >>> to_complex_case("one two 31235three4four", False, "-")
+    'one-two-31235three4four'
+    """
+    try:
+        string_split = split_input(text)
+        if upper:
+            # Join each word uppercased, separated by the given separator
+            res_str = "".join(
+                [
+                    separator.join([char.upper() for char in sub_str])
+                    for sub_str in string_split
+                ]
+            )
+        else:
+            # Join each word lowercased, separated by the given separator
+            res_str = "".join(
+                [
+                    separator.join([char.lower() for char in sub_str])
+                    for sub_str in string_split
+                ]
+            )
+        return res_str
+    except IndexError:
+        return "not valid string"
+
+
+# main content
+def to_pascal_case(text: str) -> str:
+    """
+    Converts string to PascalCase (UpperCamelCase): each word capitalized, no separator.
+
+    >>> to_pascal_case("one two 31235three4four")
+    'OneTwo31235three4four'
+    """
+    return to_simple_case(text)
+
+
+def to_camel_case(text: str) -> str:
+    """
+    Converts string to camelCase: first word lowercase, subsequent words capitalized.
+
+    >>> to_camel_case("one two 31235three4four")
+    'oneTwo31235three4four'
+    """
+    try:
+        res_str = to_simple_case(text)
+        return res_str[0].lower() + res_str[1:]  # lowercase only the first character
+    except IndexError:
+        return "not valid string"
+
+
+def to_snake_case(text: str, upper: bool) -> str:
+    """
+    Converts string to snake_case (lower) or SCREAMING_SNAKE_CASE (upper).
+
+    >>> to_snake_case("one two 31235three4four", True)
+    'ONE_TWO_31235THREE4FOUR'
+    >>> to_snake_case("one two 31235three4four", False)
+    'one_two_31235three4four'
+    """
+    return to_complex_case(text, upper, "_")
+
+
+def to_kebab_case(text: str, upper: bool) -> str:
+    """
+    Converts string to kebab-case (lower) or SCREAMING-KEBAB-CASE (upper).
+
+    >>> to_kebab_case("one two 31235three4four", True)
+    'ONE-TWO-31235THREE4FOUR'
+    >>> to_kebab_case("one two 31235three4four", False)
+    'one-two-31235three4four'
+    """
+    return to_complex_case(text, upper, "-")
+
+
+if __name__ == "__main__":
+    __import__("doctest").testmod()
