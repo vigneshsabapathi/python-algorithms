@@ -1,0 +1,106 @@
+# Algorithms to determine if a string is palindrome
+
+from timeit import timeit
+
+test_data = {
+    "MALAYALAM": True,
+    "String": False,
+    "rotor": True,
+    "level": True,
+    "A": True,
+    "BB": True,
+    "ABC": False,
+    "amanaplanacanalpanama": True,  # "a man a plan a canal panama"
+    "abcdba": False,
+    "AB": False,
+}
+# Ensure our test data is valid
+assert all((key == key[::-1]) == value for key, value in test_data.items())
+
+
+def is_palindrome(s: str) -> bool:
+    """
+    Return True if s is a palindrome otherwise return False.
+    Two-pointer approach: compare characters from both ends moving inward.
+
+    >>> all(is_palindrome(key) == value for key, value in test_data.items())
+    True
+    """
+    start_i = 0
+    end_i = len(s) - 1
+
+    while start_i < end_i:
+        if s[start_i] == s[end_i]:
+            start_i += 1
+            end_i -= 1
+        else:
+            return False  # mismatch found — not a palindrome
+    return True
+
+
+def is_palindrome_traversal(s: str) -> bool:
+    """
+    Return True if s is a palindrome otherwise return False.
+    Traverse only the first half; compare each position with its mirror.
+
+    >>> all(is_palindrome_traversal(key) == value for key, value in test_data.items())
+    True
+    """
+    end = len(s) // 2
+    n = len(s)
+
+    # Only need to traverse half the string:
+    # s[i] mirrors s[n-i-1], so checking the first half is sufficient
+    return all(s[i] == s[n - i - 1] for i in range(end))
+
+
+def is_palindrome_recursive(s: str) -> bool:
+    """
+    Return True if s is a palindrome otherwise return False.
+    Recursive approach: peel off outer characters and recurse on the inner string.
+
+    >>> all(is_palindrome_recursive(key) == value for key, value in test_data.items())
+    True
+    """
+    if len(s) <= 1:
+        return True  # base case: single char or empty string is always a palindrome
+    if s[0] == s[len(s) - 1]:
+        return is_palindrome_recursive(s[1:-1])  # strip outer chars, recurse
+    else:
+        return False  # outer chars differ — not a palindrome
+
+
+def is_palindrome_slice(s: str) -> bool:
+    """
+    Return True if s is a palindrome otherwise return False.
+    One-liner: compare string to its reverse.
+
+    >>> all(is_palindrome_slice(key) == value for key, value in test_data.items())
+    True
+    """
+    return s == s[::-1]
+
+
+def benchmark_function(name: str) -> None:
+    stmt = f"all({name}(key) == value for key, value in test_data.items())"
+    setup = f"from __main__ import test_data, {name}"
+    number = 500000
+    result = timeit(stmt=stmt, setup=setup, number=number)
+    print(f"{name:<35} finished {number:,} runs in {result:.5f} seconds")
+
+
+if __name__ == "__main__":
+    for key, value in test_data.items():
+        assert is_palindrome(key) == is_palindrome_recursive(key)
+        assert is_palindrome(key) == is_palindrome_slice(key)
+        print(f"{key:21} {value}")
+    print("a man a plan a canal panama")
+
+    # finished 500,000 runs in 0.46793 seconds
+    benchmark_function("is_palindrome_slice")
+    # finished 500,000 runs in 0.85234 seconds
+    benchmark_function("is_palindrome")
+    # finished 500,000 runs in 1.32028 seconds
+    benchmark_function("is_palindrome_recursive")
+    # finished 500,000 runs in 2.08679 seconds
+    benchmark_function("is_palindrome_traversal")
