@@ -179,19 +179,15 @@ def count_permutations(n: int) -> int:
 
 
 def run_all() -> None:
-    import sys
-    import os
-    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from backtracking.all_permutations import create_state_space_tree
-
     print("\n=== Correctness check ===")
-    for seq in [[1, 2, 3], ["A", "B", "C"], [1], [3, 1, 2], [1, 2, 3, 4]]:
-        ref = sorted(map(tuple, permutations_itertools(seq)))
-        r_swap = sorted(map(tuple, permutations_swap(seq)))
-        r_heap = sorted(map(tuple, permutations_heaps(seq)))
-        r_gen = sorted(map(tuple, permutations_generator(seq)))
+    for original in [[1, 2, 3], ["A", "B", "C"], [1], [3, 1, 2], [1, 2, 3, 4]]:
+        seq = original[:]
+        ref = sorted(map(tuple, permutations_itertools(seq[:])))
+        r_swap = sorted(map(tuple, permutations_swap(seq[:])))
+        r_heap = sorted(map(tuple, permutations_heaps(seq[:])))
+        r_gen = sorted(map(tuple, permutations_generator(seq[:])))
         all_match = r_swap == ref and r_heap == ref and r_gen == ref
-        print(f"  {str(seq):>25}  n={len(seq)}  n!={math.factorial(len(seq)):>6}  "
+        print(f"  {str(original):>25}  n={len(original)}  n!={math.factorial(len(original)):>6}  "
               f"{'OK' if all_match else 'MISMATCH'}")
 
     REPS = 3000
@@ -202,10 +198,10 @@ def run_all() -> None:
     for n in [3, 4, 5, 6, 7]:
         seq = list(range(1, n + 1))
         cnt = math.factorial(n)
-        t_it = timeit.timeit(lambda: permutations_itertools(seq), number=REPS) * 1000 / REPS
-        t_swap = timeit.timeit(lambda: permutations_swap(seq), number=REPS) * 1000 / REPS
-        t_heap = timeit.timeit(lambda: permutations_heaps(seq), number=REPS) * 1000 / REPS
-        t_gen = timeit.timeit(lambda: list(permutations_generator(seq)), number=REPS) * 1000 / REPS
+        t_it = timeit.timeit(lambda: permutations_itertools(seq[:]), number=REPS) * 1000 / REPS
+        t_swap = timeit.timeit(lambda: permutations_swap(seq[:]), number=REPS) * 1000 / REPS
+        t_heap = timeit.timeit(lambda: permutations_heaps(seq[:]), number=REPS) * 1000 / REPS
+        t_gen = timeit.timeit(lambda: list(permutations_generator(seq[:])), number=REPS) * 1000 / REPS
         print(f"  {n:>3} {cnt:>8}  {t_it:>11.4f}ms  {t_swap:>11.4f}ms  "
               f"{t_heap:>11.4f}ms  {t_gen:>11.4f}ms")
 
